@@ -1,33 +1,38 @@
 import 'react-native-gesture-handler';
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { connect } from 'react-redux';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
 import { createStackNavigator } from '@react-navigation/stack';
-// import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import deckHome from './components/deckHome';
 import deckStack from './components/deck';
-import addDeck from './components/addDeck';
 import deckHomeStack from './components/deckHome';
+import reducer from './reducers';
+import { handleInitialData } from './actions/index';
+import middleware from './middleware';
 
-// const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
+const store = createStore(reducer, middleware);
 
-export default function App() {
+function App(props) {
+	useEffect(() => {
+		props.fetchAll();
+	}, [props]);
 	return (
-		<NavigationContainer>
-			{/* <Tab.Navigator initialRouteName='Decks'>
-				<Tab.Screen name='Decks' component={deckHomeStack} />
+		<Provider store={store}>
+			<NavigationContainer>
+				<HomeStack.Navigator>
+					<HomeStack.Screen name='Decks' component={deckHomeStack} />
 
-				<Tab.Screen name='Add Deck' component={addDeck} />
-			</Tab.Navigator> */}
-			<HomeStack.Navigator>
-				<HomeStack.Screen name='Decks' component={deckHomeStack} />
-				{/* name of Deck is going to change to a variable for any deck clicked, so customer header would be used */}
-				<HomeStack.Screen name='Deck' component={deckStack} />
-			</HomeStack.Navigator>
-		</NavigationContainer>
+					<HomeStack.Screen
+						name='Deck'
+						component={deckStack}
+						options={{ headerShown: false }}
+					/>
+				</HomeStack.Navigator>
+			</NavigationContainer>
+		</Provider>
 	);
 }
 
@@ -39,3 +44,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 });
+const mapDispatchToProps = (dispatch) => {
+	return {
+		fetchAll: () => dispatch(handleInitialData()),
+	};
+};
+
+export default connect(null, mapDispatchToProps)(App);

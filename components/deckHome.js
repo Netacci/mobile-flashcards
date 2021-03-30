@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, Platform, TouchableOpacity } from 'react-native';
-import { createStackNavigator } from '@react-navigation/stack';
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import deckStack from './deck';
+import { connect } from 'react-redux';
 import addDeck from './addDeck';
 
 function deckHome({ navigation }) {
@@ -11,38 +11,41 @@ function deckHome({ navigation }) {
 			style={styles.deck}
 			onPress={() => navigation.navigate('Deck')}
 		>
-			<Text>Deck 1</Text>
-			<Text>3 Cards</Text>
+			<Text style={styles.text}>Deck 1</Text>
+			<Text style={[styles.text, { marginTop: 20, fontSize: 18 }]}>
+				3 Cards
+			</Text>
 		</TouchableOpacity>
 	);
 }
-// const HomeStack = createStackNavigator();
+
 const Tab = createBottomTabNavigator();
 
-export default function deckHomeStack() {
+function deckHomeStack() {
 	return (
-		<Tab.Navigator>
+		<Tab.Navigator
+			tabBarOptions={{
+				labelStyle: {
+					fontSize: 16,
+					fontWeight: 'bold',
+
+					marginBottom: 10,
+				},
+				activeTintColor: '#008d29',
+				style: { backgroundColor: '#f7ebf6' },
+			}}
+		>
 			<Tab.Screen name='Decks' component={deckHome} />
 
-			<Tab.Screen name='Add Deck' component={addDeck} />
+			<Tab.Screen style={styles.text} name='Add Deck' component={addDeck} />
 		</Tab.Navigator>
-		// <HomeStack.Navigator>
-		// 	<HomeStack.Screen name='Decks' component={deckHome} />
-		// 	{/* name of Deck is going to change to a variable for any deck clicked, so customer header would be used */}
-		// 	<HomeStack.Screen name='Deck' component={deckStack} />
-		// </HomeStack.Navigator>
-		// <HomeStack.Navigator>
-
-		// <HomeStack.Screen name='Decks' component={deckHome} />
-		/* name of Deck is going to change to a variable for any deck clicked, so customer header would be used */
-		// <HomeStack.Screen name='Deck' component={deckStack} />
-		// </HomeStack.Navigator>
 	);
 }
 
 const styles = StyleSheet.create({
 	deck: {
-		backgroundColor: '#ffffff',
+		backgroundColor: '#82dfa3',
+
 		borderRadius: Platform.OS === 'ios' ? 16 : 2,
 		padding: 20,
 		marginRight: 10,
@@ -57,4 +60,17 @@ const styles = StyleSheet.create({
 			height: 3,
 		},
 	},
+	text: {
+		color: '#ffffff',
+		fontSize: 22,
+		fontWeight: 'bold',
+	},
 });
+
+const mapStateToProps = (state) => {
+	console.log(state);
+	return {
+		decks: state.decks,
+	};
+};
+export default connect(mapStateToProps)(deckHomeStack);
